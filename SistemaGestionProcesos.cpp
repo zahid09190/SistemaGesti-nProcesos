@@ -5,18 +5,18 @@ using namespace std;
 struct Proceso {
     int id;
     string nombre;
-    int prioridad; // 0 = mÃ¡s alta, 4 = mÃ¡s baja
+    int prioridad; // 0 = más alta, 4 = más baja
     string estado; // "nuevo", "listo", "ejecutando", "terminado"
     Proceso* siguiente;
 };
 
-// 2. Lista enlazada para gestiÃ³n de procesos
+// 2. Lista enlazada para gestión de procesos
 class ListaProcesos {
 private:
     Proceso* cabeza;
     int contadorId;
 public:
-    ListaProcesos() : cabeza(nullptr), contadorId(1) {}
+    ListaProcesos() : cabeza(NULL), contadorId(1) {} // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
     
     void insertarProceso(string nombre, int prioridad) {
         Proceso* nuevo = new Proceso();
@@ -24,13 +24,13 @@ public:
         nuevo->nombre = nombre;
         nuevo->prioridad = prioridad;
         nuevo->estado = "nuevo";
-        nuevo->siguiente = nullptr;
+        nuevo->siguiente = NULL; // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
         
-        if (cabeza == nullptr) {
+        if (cabeza == NULL) { // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
             cabeza = nuevo;
         } else {
             Proceso* actual = cabeza;
-            while (actual->siguiente != nullptr) {
+            while (actual->siguiente != NULL) { // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
                 actual = actual->siguiente;
             }
             actual->siguiente = nuevo;
@@ -41,9 +41,9 @@ public:
     void mostrarProcesos() {
         cout << "\n=== LISTA DE PROCESOS ===" << endl;
         Proceso* actual = cabeza;
-        while (actual != nullptr) {
-            cout << "ID: " << actual->id 
-                 << " | Nombre: " << actual->nombre 
+        while (actual != NULL) { // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
+            cout << "ID: " << actual->id  
+                 << " | Nombre: " << actual->nombre  
                  << " | Prioridad: " << actual->prioridad
                  << " | Estado: " << actual->estado << endl;
             actual = actual->siguiente;
@@ -53,17 +53,17 @@ public:
     
     Proceso* buscarProceso(int id) {
         Proceso* actual = cabeza;
-        while (actual != nullptr) {
+        while (actual != NULL) { // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
             if (actual->id == id) {
                 return actual;
             }
             actual = actual->siguiente;
         }
-        return nullptr;
+        return NULL; // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
     }
     
     void eliminarProceso(int id) {
-        if (cabeza == nullptr) return;
+        if (cabeza == NULL) return; // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
         
         if (cabeza->id == id) {
             Proceso* temp = cabeza;
@@ -74,11 +74,11 @@ public:
         }
         
         Proceso* actual = cabeza;
-        while (actual->siguiente != nullptr && actual->siguiente->id != id) {
+        while (actual->siguiente != NULL && actual->siguiente->id != id) { // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
             actual = actual->siguiente;
         }
         
-        if (actual->siguiente != nullptr) {
+        if (actual->siguiente != NULL) { // cambie nullptr a NULL por que esta version de Dev-C++ no recocono nullptr
             Proceso* temp = actual->siguiente;
             actual->siguiente = temp->siguiente;
             delete temp;
@@ -89,23 +89,23 @@ public:
     }
 };
 
-// 3. Cola de prioridad para planificaciÃ³n
+// 3. Cola de prioridad para planificación
 class ColaPrioridad {
 private:
     Proceso* frente;
 public:
-    ColaPrioridad() : frente(nullptr) {}
+    ColaPrioridad() : frente(NULL) {} // Changed nullptr to NULL
     
     void encolar(Proceso* proceso) {
         proceso->estado = "listo";
-        proceso->siguiente = nullptr;
+        proceso->siguiente = NULL; // Changed nullptr to NULL
         
-        if (frente == nullptr || proceso->prioridad < frente->prioridad) {
+        if (frente == NULL || proceso->prioridad < frente->prioridad) { // Changed nullptr to NULL
             proceso->siguiente = frente;
             frente = proceso;
         } else {
             Proceso* actual = frente;
-            while (actual->siguiente != nullptr && 
+            while (actual->siguiente != NULL &&  // Changed nullptr to NULL
                    actual->siguiente->prioridad <= proceso->prioridad) {
                 actual = actual->siguiente;
             }
@@ -116,7 +116,7 @@ public:
     }
     
     void ejecutarProceso() {
-        if (frente == nullptr) {
+        if (frente == NULL) { // Changed nullptr to NULL
             cout << "No hay procesos en cola." << endl;
             return;
         }
@@ -134,7 +134,7 @@ public:
     }
 };
 
-// 4. MenÃº principal
+// 4. Menú principal
 void mostrarMenu() {
     cout << "\n=== SISTEMA DE GESTION DE PROCESOS ===" << endl;
     cout << "1. Crear nuevo proceso" << endl;
@@ -164,38 +164,38 @@ int main() {
                 cin >> prioridad;
                 lista.insertarProceso(nombre, prioridad);
                 break;
-                
+            
             case 2:
                 lista.mostrarProcesos();
                 break;
-                
+            
             case 3:
                 cout << "ID del proceso a eliminar: ";
                 cin >> id;
                 lista.eliminarProceso(id);
                 break;
-                
+            
             case 4:
                 cout << "ID del proceso a encolar: ";
                 cin >> id;
                 {
                     Proceso* p = lista.buscarProceso(id);
-                    if (p != nullptr) {
+                    if (p != NULL) { // Changed nullptr to NULL               
                         cola.encolar(p);
                     } else {
                         cout << "Proceso no encontrado." << endl;
                     }
                 }
                 break;
-                
+            
             case 5:
                 cola.ejecutarProceso();
                 break;
-                
+            
             case 6:
                 cout << "Saliendo del sistema..." << endl;
                 break;
-                
+            
             default:
                 cout << "Opcion no valida. Intente nuevamente." << endl;
         }
