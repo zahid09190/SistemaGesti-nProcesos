@@ -132,6 +132,11 @@ public:
     ColaPrioridad() : frente(NULL) {}
 
     void encolar(Proceso* proceso) {
+        if (proceso->estado == "bloqueado") {
+            cout << "No se puede encolar el proceso " << proceso->id << " porque está bloqueado." << endl;
+            return;
+        }
+
         proceso->estado = "listo";
         proceso->siguiente = NULL;
 
@@ -183,6 +188,8 @@ void mostrarMenu() {
     cout << "5. Ejecutar siguiente proceso" << endl;
     cout << "6. Salir" << endl;
     cout << "7. Ver historial de procesos ejecutados" << endl;
+    cout << "8. Bloquear un proceso" << endl;
+    cout << "9. Desbloquear un proceso" << endl;
     cout << "Seleccione una opcion: ";
 }
 
@@ -198,12 +205,18 @@ int main() {
 
         switch(opcion) {
             case 1:
-                cout << "Nombre del proceso: ";
-                cin >> nombre;
-                cout << "Prioridad (0-4): ";
-                cin >> prioridad;
-                lista.insertarProceso(nombre, prioridad);
-                break;
+    cout << "Nombre del proceso: ";
+    cin >> nombre;
+
+    do {
+        cout << "Prioridad (0-4): ";
+        cin >> prioridad;
+        if (prioridad < 0 || prioridad > 4) {
+            cout << "Prioridad inválida. Debe estar entre 0 y 4." << endl;
+        }
+    } while (prioridad < 0 || prioridad > 4);
+
+    lista.insertarProceso(nombre, prioridad);
 
             case 2:
                 lista.mostrarProcesos();
@@ -240,6 +253,38 @@ int main() {
                 pila.mostrarHistorial();
                 break;
 
+            case 8:
+                cout << "ID del proceso a bloquear: ";
+                cin >> id;
+                {
+                    Proceso* p = lista.buscarProceso(id);
+                    if (p != NULL) {
+                        p->estado = "bloqueado";
+                        cout << "Proceso " << id << " bloqueado." << endl;
+                    } else {
+                        cout << "Proceso no encontrado." << endl;
+                    }
+                }
+                break;
+
+            case 9:
+                cout << "ID del proceso a desbloquear: ";
+                cin >> id;
+                {
+                    Proceso* p = lista.buscarProceso(id);
+                    if (p != NULL) {
+                        if (p->estado == "bloqueado") {
+                            p->estado = "nuevo";
+                            cout << "Proceso " << id << " desbloqueado." << endl;
+                        } else {
+                            cout << "El proceso no está bloqueado." << endl;
+                        }
+                    } else {
+                        cout << "Proceso no encontrado." << endl;
+                    }
+                }
+                break;
+
             default:
                 cout << "Opcion no valida. Intente nuevamente." << endl;
         }
@@ -247,3 +292,4 @@ int main() {
 
     return 0;
 }
+
