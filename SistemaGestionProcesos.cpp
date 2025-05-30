@@ -10,6 +10,52 @@ struct Proceso {
     Proceso* siguiente;
 };
 
+// === NUEVA CLASE: Pila para procesos ejecutados ===
+class PilaProcesos {
+private:
+    Proceso* cima;
+public:
+    PilaProcesos() : cima(NULL) {}
+
+    void apilar(Proceso* p) {
+        p->estado = "terminado";
+        p->siguiente = cima;
+        cima = p;
+    }
+
+    void mostrarHistorial() {
+        Proceso* actual = cima;
+        if (actual == NULL) {
+            cout << "\nHistorial vacío. No hay procesos ejecutados aún." << endl;
+            return;
+        }
+
+        cout << "\n=== HISTORIAL DE PROCESOS TERMINADOS ===" << endl;
+        while (actual != NULL) {
+            cout << "ID: " << actual->id
+                 << " | Nombre: " << actual->nombre
+                 << " | Prioridad: " << actual->prioridad
+                 << " | Estado: " << actual->estado << endl;
+            actual = actual->siguiente;
+        }
+        cout << "=========================================" << endl;
+    }
+
+    // NUEVO: contar procesos ejecutados
+    int contarProcesos() {
+        int contador = 0;
+        Proceso* actual = cima;
+        while (actual != NULL) {
+            contador++;
+            actual = actual->siguiente;
+        }
+        return contador;
+    }
+};
+
+// Instancia global
+PilaProcesos pila;
+
 // 2. Lista enlazada para gestión de procesos
 class ListaProcesos {
 private:
@@ -106,42 +152,31 @@ public:
         }
         cout << "Proceso " << id << " no encontrado." << endl;
     }
-};
 
-// === NUEVA CLASE: Pila para procesos ejecutados ===
-class PilaProcesos {
-private:
-    Proceso* cima;
-public:
-    PilaProcesos() : cima(NULL) {}
+    // NUEVO: Mostrar estadísticas
+    void mostrarEstadisticas() {
+        int total = 0, bloqueados = 0, activos = 0;
 
-    void apilar(Proceso* p) {
-        p->estado = "terminado";
-        p->siguiente = cima;
-        cima = p;
-    }
-
-    void mostrarHistorial() {
-        Proceso* actual = cima;
-        if (actual == NULL) {
-            cout << "\nHistorial vacío. No hay procesos ejecutados aún." << endl;
-            return;
-        }
-
-        cout << "\n=== HISTORIAL DE PROCESOS TERMINADOS ===" << endl;
+        Proceso* actual = cabeza;
         while (actual != NULL) {
-            cout << "ID: " << actual->id
-                 << " | Nombre: " << actual->nombre
-                 << " | Prioridad: " << actual->prioridad
-                 << " | Estado: " << actual->estado << endl;
+            total++;
+            if (actual->estado == "bloqueado") bloqueados++;
+            if (actual->estado != "terminado") activos++;
             actual = actual->siguiente;
         }
-        cout << "=========================================" << endl;
+
+        cout << "\n=== ESTADÍSTICAS GENERALES ===" << endl;
+        cout << "Total de procesos creados: " << total << endl;
+        cout << "Total de procesos ejecutados: " << contarEjecutados() << endl;
+        cout << "Total de procesos activos: " << activos << endl;
+        cout << "Total de procesos bloqueados: " << bloqueados << endl;
+        cout << "===============================" << endl;
+    }
+
+    int contarEjecutados() {
+        return pila.contarProcesos();  // llama a la pila global
     }
 };
-
-// === Instancia global de pila ===
-PilaProcesos pila;
 
 // 3. Cola de prioridad para planificación
 class ColaPrioridad {
@@ -190,9 +225,7 @@ public:
         Proceso* temp = frente;
         frente = frente->siguiente;
 
-        // Apilar en historial ANTES de eliminar
         pila.apilar(temp);
-
         delete temp;
     }
 };
@@ -208,8 +241,9 @@ void mostrarMenu() {
     cout << "6. Ver historial de procesos ejecutados" << endl;
     cout << "7. Bloquear un proceso" << endl;
     cout << "8. Desbloquear un proceso" << endl;
-    cout << "9. Modificar prioridad de un proceso" << endl;  // NUEVA OPCIÓN
-    cout << "10. Salir" << endl;
+    cout << "9. Modificar prioridad de un proceso" << endl;
+    cout << "10. Mostrar estadísticas generales" << endl;
+    cout << "11. Salir" << endl;
     cout << "Seleccione una opcion: ";
 }
 
@@ -225,18 +259,19 @@ int main() {
 
         switch(opcion) {
             case 1:
-			    cout << "Nombre del proceso: ";
-			    cin >> nombre;
-			
-			    do {
-			        cout << "Prioridad (0-4): ";
-			        cin >> prioridad;
-			        if (prioridad < 0 || prioridad > 4) {
-			            cout << "Prioridad inválida. Debe estar entre 0 y 4." << endl;
-			        }
-			    } while (prioridad < 0 || prioridad > 4);
-			
-			    lista.insertarProceso(nombre, prioridad);
+                cout << "Nombre del proceso: ";
+                cin >> nombre;
+
+                do {
+                    cout << "Prioridad (0-4): ";
+                    cin >> prioridad;
+                    if (prioridad < 0 || prioridad > 4) {
+                        cout << "Prioridad inválida. Debe estar entre 0 y 4." << endl;
+                    }
+                } while (prioridad < 0 || prioridad > 4);
+
+                lista.insertarProceso(nombre, prioridad);
+                break;
 
             case 2:
                 lista.mostrarProcesos();
@@ -264,6 +299,7 @@ int main() {
             case 5:
                 cola.ejecutarProceso();
                 break;
+
             case 6:
                 pila.mostrarHistorial();
                 break;
@@ -299,8 +335,8 @@ int main() {
                     }
                 }
                 break;
-                
-            case 9:   // NUEVO CASO
+
+            case 9:
                 cout << "Ingrese el ID del proceso a modificar: ";
                 cin >> id;
                 cout << "Ingrese la nueva prioridad (0-4): ";
@@ -309,14 +345,17 @@ int main() {
                 break;
 
             case 10:
+                lista.mostrarEstadisticas();
+                break;
+
+            case 11:
                 cout << "Saliendo del sistema..." << endl;
                 break;
 
             default:
                 cout << "Opcion no valida. Intente nuevamente." << endl;
         }
-    } while(opcion != 6);
+    } while(opcion != 11);
 
     return 0;
 }
-
