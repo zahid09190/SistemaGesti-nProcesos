@@ -87,6 +87,25 @@ public:
             cout << "Proceso no encontrado." << endl;
         }
     }
+    
+    void modificarPrioridadProceso(int id, int nuevaPrioridad) {
+        if (nuevaPrioridad < 0 || nuevaPrioridad > 4) {
+            cout << "Prioridad invalida. Debe estar entre 0 y 4." << endl;
+            return;
+        }
+
+        Proceso* actual = cabeza;
+        while (actual != NULL) {
+            if (actual->id == id) {
+                actual->prioridad = nuevaPrioridad;
+                cout << "Prioridad del proceso " << id << " modificada a "
+                     << nuevaPrioridad << "." << endl;
+                return;
+            }
+            actual = actual->siguiente;
+        }
+        cout << "Proceso " << id << " no encontrado." << endl;
+    }
 };
 
 // === NUEVA CLASE: Pila para procesos ejecutados ===
@@ -186,10 +205,11 @@ void mostrarMenu() {
     cout << "3. Eliminar proceso" << endl;
     cout << "4. Encolar proceso para ejecucion" << endl;
     cout << "5. Ejecutar siguiente proceso" << endl;
-    cout << "6. Salir" << endl;
-    cout << "7. Ver historial de procesos ejecutados" << endl;
-    cout << "8. Bloquear un proceso" << endl;
-    cout << "9. Desbloquear un proceso" << endl;
+    cout << "6. Ver historial de procesos ejecutados" << endl;
+    cout << "7. Bloquear un proceso" << endl;
+    cout << "8. Desbloquear un proceso" << endl;
+    cout << "9. Modificar prioridad de un proceso" << endl;  // NUEVA OPCIÓN
+    cout << "10. Salir" << endl;
     cout << "Seleccione una opcion: ";
 }
 
@@ -205,18 +225,18 @@ int main() {
 
         switch(opcion) {
             case 1:
-    cout << "Nombre del proceso: ";
-    cin >> nombre;
-
-    do {
-        cout << "Prioridad (0-4): ";
-        cin >> prioridad;
-        if (prioridad < 0 || prioridad > 4) {
-            cout << "Prioridad inválida. Debe estar entre 0 y 4." << endl;
-        }
-    } while (prioridad < 0 || prioridad > 4);
-
-    lista.insertarProceso(nombre, prioridad);
+			    cout << "Nombre del proceso: ";
+			    cin >> nombre;
+			
+			    do {
+			        cout << "Prioridad (0-4): ";
+			        cin >> prioridad;
+			        if (prioridad < 0 || prioridad > 4) {
+			            cout << "Prioridad inválida. Debe estar entre 0 y 4." << endl;
+			        }
+			    } while (prioridad < 0 || prioridad > 4);
+			
+			    lista.insertarProceso(nombre, prioridad);
 
             case 2:
                 lista.mostrarProcesos();
@@ -244,16 +264,11 @@ int main() {
             case 5:
                 cola.ejecutarProceso();
                 break;
-
             case 6:
-                cout << "Saliendo del sistema..." << endl;
-                break;
-
-            case 7:
                 pila.mostrarHistorial();
                 break;
 
-            case 8:
+            case 7:
                 cout << "ID del proceso a bloquear: ";
                 cin >> id;
                 {
@@ -267,7 +282,7 @@ int main() {
                 }
                 break;
 
-            case 9:
+            case 8:
                 cout << "ID del proceso a desbloquear: ";
                 cin >> id;
                 {
@@ -284,11 +299,23 @@ int main() {
                     }
                 }
                 break;
+                
+            case 9:   // NUEVO CASO
+                cout << "Ingrese el ID del proceso a modificar: ";
+                cin >> id;
+                cout << "Ingrese la nueva prioridad (0-4): ";
+                cin >> prioridad;
+                lista.modificarPrioridadProceso(id, prioridad);
+                break;
+
+            case 10:
+                cout << "Saliendo del sistema..." << endl;
+                break;
 
             default:
                 cout << "Opcion no valida. Intente nuevamente." << endl;
         }
-    } while (opcion != 6);
+    } while(opcion != 6);
 
     return 0;
 }
